@@ -39,7 +39,7 @@ router.get('/', authenticateToken, async (req, res) => {
       query.rating = rating;
     }
 
-    if (!req.user.isAdult) {
+    if (req.user && !req.user.isAdult) {
       query.rating = { $nin: ['R', 'NC-17', 'TV-MA'] };
     }
 
