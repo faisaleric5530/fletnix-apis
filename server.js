@@ -18,12 +18,23 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+const allowedOrigins = [
+  'http://localhost:4200',
+  process.env.PROD_CLIENT_URL
+];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [`${process.env.PROD_CLIENT_URL}`] 
-    : ['http://localhost:4200'],
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed for this origin'));
+    }
+  },
+  credentials: true,
 }));
+
+app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
